@@ -122,8 +122,27 @@ def _find_player(query: str, players: dict) -> list[dict]:
     return [_compact_player(p) for _, p in hits[:5]]
 
 
+# Two-way player detection (e.g., Travis Hunter — WR + DB).
+# Sleeper's depth_chart_position can refer to the defensive slot for these
+# players, which misleads any naive offense-depth interpretation.
+_OFFENSE_POSITIONS = {"QB", "RB", "WR", "TE", "FB"}
+_DEFENSE_POSITIONS = {
+    "DB", "DL", "LB", "DE", "DT", "CB", "S", "SS", "FS",
+    "ILB", "OLB", "MLB", "NT",
+}
+
+
+def _is_two_way(p: dict) -> bool:
+    """True if fantasy_positions span both offense and defense."""
+    fantasy_pos = p.get("fantasy_positions") or []
+    has_offense = any(pos in _OFFENSE_POSITIONS for pos in fantasy_pos)
+    has_defense = any(pos in _DEFENSE_POSITIONS for pos in fantasy_pos)
+    return has_offense and has_defense
+
+
 def _compact_player(p: dict) -> dict:
     """Slim down the fat Sleeper player record to fields the skill needs."""
+    two_way = _is_two_way(p)
     return {
         "player_id": p.get("player_id"),
         "full_name": p.get("full_name"),
@@ -140,6 +159,12 @@ def _compact_player(p: dict) -> dict:
         "depth_chart_position": p.get("depth_chart_position"),
         "depth_chart_order": p.get("depth_chart_order"),
         "fantasy_positions": p.get("fantasy_positions"),
+        "is_two_way": two_way,
+        "depth_chart_note": (
+            "depth_chart_position refers to the defensive slot for this two-way "
+            "player; use fantasy_positions to determine offense/IDP scoring context."
+            if two_way else None
+        ),
     }
 
 
@@ -172,15 +197,32 @@ def cmd_weekly_stats(args) -> None:
 
     Sleeper exposes /stats/nfl/regular/{season}/{week} returning a dict
     keyed by player_id with raw stat fields. We collect that for N weeks.
+
+    Off-season behaviour: if state.season_type == "off", default to the
+    previous season and anchor at week 18 — otherwise the skill would
+    query an unstarted season and return only nulls.
+
+    End-week resolution order:
+        1. Explicit --end-week wins.
+        2. Live current season → state.week (fallback to 1 in pre-season).
+        3. Past season or off-season default → assume completed → week 18.
     """
     state = _get(f"{BASE_URL}/state/nfl")
-    season = args.season or state.get("season")
-    current_week = state.get("week") or 1
 
-    weeks_to_fetch = []
-    end_week = min(int(current_week), 18)
-    for w in range(max(1, end_week - args.weeks + 1), end_week + 1):
-        weeks_to_fetch.append(w)
+    in_off_season = state.get("season_type") == "off"
+    default_season = state.get("previous_season") if in_off_season else state.get("season")
+    season = args.season or default_season
+
+    if args.end_week is not None:
+        end_week = args.end_week
+    elif str(season) == str(state.get("season")) and not in_off_season:
+        end_week = state.get("week") or 1
+    else:
+        end_week = 18
+
+    end_week = min(int(end_week), 18)
+    start_week = max(1, end_week - args.weeks + 1)
+    weeks_to_fetch = list(range(start_week, end_week + 1))
 
     history = []
     for w in weeks_to_fetch:
@@ -251,6 +293,19 @@ def cmd_matchup(args) -> None:
     team = args.team.upper()
 
     schedule = _get(f"{SCHEDULE_URL}/{season}")
+    if not schedule:
+        # Off-season + future season → Sleeper has no schedule yet.
+        # Distinguish this from a real BYE so the skill doesn't lie to the user.
+        _emit(
+            {
+                "season": season,
+                "week": int(week) if week else None,
+                "team": team,
+                "matchup": None,
+                "note": f"Schedule for season {season} is empty or not yet published by Sleeper.",
+            }
+        )
+        return
     for game in schedule:
         if game.get("week") != int(week):
             continue
@@ -359,8 +414,18 @@ def build_parser() -> argparse.ArgumentParser:
 
     ws = sub.add_parser("weekly-stats", help="Last N weeks of stats for a player.")
     ws.add_argument("player_id")
-    ws.add_argument("--season", type=int, default=None)
-    ws.add_argument("--weeks", type=int, default=4)
+    ws.add_argument(
+        "--season", type=int, default=None,
+        help="NFL season year. Default: previous_season in off-season, current season otherwise.",
+    )
+    ws.add_argument(
+        "--weeks", type=int, default=4,
+        help="How many weeks of history to fetch ending at --end-week. Default: 4.",
+    )
+    ws.add_argument(
+        "--end-week", type=int, default=None,
+        help="Anchor week (inclusive). Default: state.week in current live season, week 18 otherwise.",
+    )
     ws.set_defaults(fn=cmd_weekly_stats)
 
     m = sub.add_parser("matchup", help="NFL matchup lookup for a team in a week.")
