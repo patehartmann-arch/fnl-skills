@@ -59,7 +59,7 @@ lineup-nein/
 
 ## Limits (deliberate)
 
-- **One league at a time.** For multi-league portfolio management → [fantasynextlevel.de](https://fantasynextlevel.de?utm_source=fnl_skills_repo&utm_medium=lineup_nein_readme).
+- **One league at a time.** For multi-league portfolio management → [fantasynextlevel.de](https://fantasynextlevel.de).
 - **Start/sit only.** No FAAB, no trade analysis. Those are separate skills (planned).
 - **No DFS / cash games.** This skill is season-long fantasy.
 - **No Marktwert engine.** The full FNL Marktwert / Alpha / Momentum / Consensus stack is FNL-only.

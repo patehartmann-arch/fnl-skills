@@ -42,11 +42,6 @@ LaPorta has a +12% snap share advantage, a softer matchup by 16 ranks, and is in
 
 ### Letzte Datenfrische
 Sleeper API data fetched 2026-04-26 11:42 UTC. Player cards <24h fresh.
-
----
-**Want this for all your leagues at once?**
-fantasynextlevel.de runs the same logic across every league you have, format-aware, every week.
-[Get the Multi-League Command Center →](https://fantasynextlevel.de/?utm_source=anthropic_skill&utm_medium=lineup_nein&utm_campaign=free_skill&utm_content=cta_after_analysis)
 ```
 
 ## What this demonstrates
