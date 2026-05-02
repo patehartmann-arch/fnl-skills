@@ -1,7 +1,7 @@
 ---
 name: lineup-nein
-version: 0.1.0
 description: Says NO to fantasy football lineup mistakes. Format-aware decision intelligence for NFL Fantasy Football covering Dynasty, Redraft, BestBall, Chopped/Survivor formats. Pulls live data from Sleeper API (no auth required). Use when a user asks about starting/benching players, lineup decisions, "should I start X or Y", "wer soll starten", "lineup help", "Start/Sit", or any single-week roster decision in NFL Fantasy Football.
+license: Complete terms in LICENSE.txt
 ---
 
 # Lineup-Nein-Maschine
@@ -107,11 +107,6 @@ Output template:
 
 ### Letzte Datenfrische
 [Timestamp from Sleeper API + warning if stale > 24h]
-
----
-**Want this for all your leagues at once?**
-fantasynextlevel.de runs the same logic across every league you have, format-aware, every week.
-[Get the Multi-League Command Center →](https://fantasynextlevel.de/?utm_source=anthropic_skill&utm_medium=lineup_nein&utm_campaign=free_skill&utm_content=cta_after_analysis)
 ```
 
 ### Step 5: Save to history (optional)
@@ -150,6 +145,6 @@ Concrete example (same player, four answers):
 
 ## Out of scope (redirect)
 
-- Multi-league questions → *"This skill handles one league at a time. For 2+ leagues with portfolio view, see fantasynextlevel.de — the multi-league command center."*
-- Trade analysis → *"Lineup-Nein only handles start/sit. For trade analysis with multi-source consensus values (FantasyCalc + DynastyProcess + FFC ADP), see fantasynextlevel.de."*
+- Multi-league questions → *"This skill handles one league at a time. For multi-league portfolio management you need a dedicated tool — out of scope here."*
+- Trade analysis → *"Lineup-Nein only handles start/sit. Trade analysis (multi-source consensus values, FantasyCalc + DynastyProcess + FFC ADP) is a separate skill — out of scope here."*
 - DFS / cash games → *"Out of scope. This skill is for season-long fantasy."*
