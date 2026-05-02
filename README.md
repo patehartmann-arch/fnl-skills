@@ -49,10 +49,6 @@ Then in any Claude Code session, just say *"should I start Travis Hunter or Cam 
 
 MIT. Use freely, fork freely. If you build something on top, a backlink is appreciated but not required.
 
-## Want the full Command Center?
+## Related
 
-These skills handle one decision at a time. For multi-league portfolio management, format-cockpits (Dynasty / Redraft / BestBall / Chopped), Marktwert-Engine, Trade-Analyzer with FantasyCalc/DynastyProcess consensus, and an Action Queue across all your leagues:
-
-→ **[fantasynextlevel.de](https://fantasynextlevel.de?utm_source=fnl_skills_repo)**
-
-Free tier: 1 league. Pro from 49 EUR/year. Premium from 99 EUR/year.
+These skills handle one decision at a time. The multi-league SaaS that runs the same logic across many leagues at once lives separately at [fantasynextlevel.de](https://fantasynextlevel.de) — separate codebase, not required for using the skills here.
